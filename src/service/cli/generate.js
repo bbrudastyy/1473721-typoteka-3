@@ -1,9 +1,9 @@
 'use strict';
 
-const {getRandomInt, shuffle} = require(`../../utils`);
-const fs = require(`fs`);
+const {getRandomInt, shuffle, writeFileJson} = require(`../../utils`);
 
 const DEFAULT_COUNT = 1;
+const MAX_COUNT = 1000;
 const FILE_NAME = `mocks.json`;
 
 const TITLES = [
@@ -63,13 +63,17 @@ const getDate = () => {
   return getRandomInt(endDate.getTime(), startDate.getTime());
 };
 
+const generateDate = () => new Date(getDate());
+const generateDescription = (texts) => shuffle(texts).slice(1, 5).join(` `);
+const generateText = (texts) => texts[getRandomInt(0, texts.length - 1)];
+
 const generateOffers = (count) => {
   return Array(count).fill().map(() => ({
-    title: TITLES[getRandomInt(0, TITLES.length - 1)],
-    createdDate: new Date(getDate()),
-    announce: shuffle(ANNOUNCE).slice(1, 5).join(` `),
-    fullText: shuffle(ANNOUNCE).slice(1, 5).join(` `),
-    сategory: CATEGORIES[getRandomInt(0, CATEGORIES.length - 1)]
+    title: generateText(TITLES),
+    createdDate: generateDate(),
+    announce: generateDescription(ANNOUNCE),
+    fullText: generateDescription(ANNOUNCE),
+    сategory: generateText(CATEGORIES)
   }));
 };
 
@@ -78,14 +82,10 @@ module.exports = {
   run(args) {
     const [count] = args;
     const countOffer = Number.parseInt(count, 10) || DEFAULT_COUNT;
-    const content = JSON.stringify(generateOffers(countOffer));
-
-    fs.writeFile(FILE_NAME, content, (err) => {
-      if (err) {
-        return console.error(`Can't write data to file...`);
-      }
-
-      return console.info(`Operation success. File created.`);
-    });
+    if (countOffer < MAX_COUNT) {
+      writeFileJson(FILE_NAME, generateOffers(countOffer));
+    } else {
+      console.info(`Не больше 1000 объявлений`);
+    }
   }
 };
