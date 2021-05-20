@@ -33,8 +33,8 @@ const getDataFromFile = async (filePath) => {
     const content = await fs.readFile(filePath, `utf8`);
     return content.split(`\n`);
   } catch (err) {
-    console.error(chalk.red(err));
-    return [];
+    return console.error(chalk.red(err));
+
   }
 };
 
