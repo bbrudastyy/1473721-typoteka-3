@@ -1,6 +1,6 @@
 # Личный проект «Типотека» [![Build status][travis-image]][travis-url]
 
-* Студент: [Богдан Котов](https://up.htmlacademy.ru/nodejs/3/user/1473721).
+* Студент: [Богдан Котов](https://up.htmlacademy.ru/nodejs/3/user/1473721)
 * Наставник: [Вадим Осюков](https://htmlacademy.ru/profile/id1411353).
 
 ---
