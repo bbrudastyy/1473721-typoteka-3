@@ -1,10 +1,10 @@
 'use strict';
 
 const {Router} = require(`express`);
-const HttpCode = require(`../../httpCode`);
-const articleValidator = require(`../middlewares/article-validator`);
-const articleExist = require(`../middlewares/article-exists`);
-const commentValidator = require(`../middlewares/comment-validator`);
+const HttpCode = require(`../../../httpCode`);
+const articleValidator = require(`../../middlewares/article-validator`);
+const articleExist = require(`../../middlewares/article-exists`);
+const commentValidator = require(`../../middlewares/comment-validator`);
 
 const route = new Router();
 
@@ -52,7 +52,7 @@ module.exports = (app, articleService, commentService) => {
 
     if (!update) {
       return res.status(HttpCode.NOT_FOUND)
-       .send(`Not found with ${articleId}`);
+        .send(`Not found with ${articleId}`);
     }
     return res.status(HttpCode.OK)
       .send(`Updated`);
@@ -91,11 +91,18 @@ module.exports = (app, articleService, commentService) => {
   // DELETE /api/articles/:articleId/comments/:commentId — удаляет из определённой публикации комментарий с идентификатором;
   route.delete(`/:articleId/comments/:commentId`, articleExist(articleService), async (req, res) => {
     const {articleId, commentId} = req.params;
+    const comment = await commentService.findOne(articleId, commentId);
+
+    if (!comment) {
+      return res.status(HttpCode.NOT_FOUND)
+        .send(`Comment not found`);
+    }
+
     const deletedComment = await commentService.drop(articleId, commentId);
 
     if (!deletedComment) {
-      return res.status(HttpCode.NOT_FOUND)
-        .send(`Not found`);
+      return res.status(HttpCode.FORBIDDEN)
+        .send(`Forbidden`);
     }
 
     return res.status(HttpCode.OK)
