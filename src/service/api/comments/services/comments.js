@@ -6,6 +6,7 @@ const {MAX_ID_LENGTH} = require(`../../../../constants`);
 class CommentsService {
   constructor(articles) {
     this._articles = articles;
+    // console.error(this._articles);
   }
 
   create(articleId, comment) {
@@ -20,21 +21,11 @@ class CommentsService {
     if (!comment) {
       return null;
     }
-    // const article = this._articles((item) => item.id === articleId);
-    // const commentIdx = this.findAll(articleId).indexOf(comment);
-    // this._articles.find((item) => item.id === articleId).comments.slice(commentIdx, 1);
-    // const commentIdx = this._articles.find((item) => item.id === articleId).find((item) => item.id)
-    this.findAll(articleId).filter((item) => item.id !== commentId);
-    console.log(this._articles);
 
-    // this._articles = this._articles.filter((item) => item.id !== commentId);
+    const article = this._articles.find((item) => item.id === articleId);
+    article.comments = (article.comments || []).filter((item) => item.id !== commentId);
 
     return comment;
-    // console.log()
-
-    // return article.find((item) => item.id === commentId);
-    // this._articles = this._articles.filter((item) => item.id !== commentId);
-    // return article;
   }
 
   findAll(articleId) {

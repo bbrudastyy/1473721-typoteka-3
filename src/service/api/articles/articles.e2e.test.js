@@ -129,7 +129,7 @@ describe(`Testing API article`, () => {
       let articleServices = new DataService(cloneData);
 
       beforeAll(async () => {
-        app = await createAPI();
+        app = await createAPI([articleServices]);
         response = await request(app)
           .post(`/articles`)
           .send(newArticle);
@@ -199,6 +199,43 @@ describe(`Testing API article`, () => {
   });
 
   describe(`API changes article`, () => {
+    describe(`API deletes article`, () => {
+      describe(`API correctly deletes an article`, () => {
+
+        let app;
+        let response;
+        let articleServices;
+        let commentService;
+        articleServices = new DataService(cloneData);
+        commentService = new CommentService(cloneData);
+
+        // test(`Articles count is changed`, () => expect(articleServices.findAll()).toHaveLength(4));
+
+        beforeAll(async () => {
+          app = await createAPI([articleServices, commentService]);
+          response = await request(app)
+            .delete(`/articles/1TtuWX`);
+        });
+
+        test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
+
+        test(`Articles count is changed`, () => expect(articleServices.findAll()).toHaveLength(4));
+      });
+
+      describe(`API refuses to delete non-existent article`, () => {
+        let app;
+        let response;
+
+        beforeAll(async () => {
+          app = await createAPI();
+          response = await request(app)
+            .delete(`/articles/20`);
+        });
+
+        test(`Status code 404`, () => expect(response.statusCode).toBe(HttpCode.NOT_FOUND));
+      });
+    });
+
     describe(`API changes existent article`, () => {
 
       const newArticle = {
@@ -230,7 +267,7 @@ describe(`Testing API article`, () => {
     });
 
     describe(`API returns status code 404 when trying to change non-existent article`, () => {
-      let app = createAPI();
+      let app;
       let response;
 
       const validArticle = {
@@ -243,6 +280,7 @@ describe(`Testing API article`, () => {
       };
 
       beforeAll(async () => {
+        app = await createAPI();
         response = await request(app)
           .put(`/articles/20`)
           .send(validArticle);
@@ -274,56 +312,27 @@ describe(`Testing API article`, () => {
       test(`Status code 400`, () => expect(response.statusCode).toBe(HttpCode.BAD_REQUEST));
 
     });
-
-    describe(`API deletes article`, () => {
-      describe(`API correctly deletes an article`, () => {
-
-        let app;
-        let response;
-        let articleServices = new DataService(cloneData);
-
-        beforeAll(async () => {
-          app = await createAPI();
-          response = await request(app)
-            .delete(`/articles/1TtuWX`);
-        });
-
-        test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
-
-        test(`Articles count is changed`, () => expect(articleServices.findAll()).toHaveLength(4));
-      });
-
-      describe(`API refuses to delete non-existent article`, () => {
-        const app = createAPI();
-        let response;
-
-        beforeAll(async () => {
-          response = await request(app)
-            .delete(`/articles/20`);
-        });
-
-        test(`Status code 404`, () => expect(response.statusCode).toBe(HttpCode.NOT_FOUND));
-      });
-    });
-
   });
 
   describe(`API works with comments`, () => {
     describe(`API returns a list of comments to given article`, () => {
 
       let response;
+      let app;
+      // let articleService = new DataService(cloneData);
+      // let commentService = new DataService(cloneData);
 
       beforeAll(async () => {
-        const app = await createAPI();
+        app = await createAPI();
         response = await request(app)
-          .get(`/articles/1TtuWX/comments`);
+          .get(`/articles/wzhsa2/comments`);
       });
 
       test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
 
-      test(`Returns list of 4 comments`, () => expect(response.body.length).toBe(4));
+      test(`Returns list of 2 comments`, () => expect(response.body.length).toBe(2));
 
-      test(`First comment's text is "Согласен с автором! Мне не нравится ваш стиль. Ощущение, что вы меня поучаете. Мне кажется или я уже читал это где-то?"`, () => expect(response.body[0].text).toBe(`Согласен с автором! Мне не нравится ваш стиль. Ощущение, что вы меня поучаете. Мне кажется или я уже читал это где-то?`));
+      test(`First comment's text is "Хочу такую же футболку :-)"`, () => expect(response.body[0].text).toBe(`Хочу такую же футболку :-)`));
 
     });
 
@@ -340,7 +349,7 @@ describe(`Testing API article`, () => {
       beforeAll(async () => {
         app = await createAPI();
         response = await request(app)
-          .post(`/articles/1TtuWX/comments`)
+          .post(`/articles/wzhsa2/comments`)
           .send(newComment);
       });
 
@@ -348,15 +357,14 @@ describe(`Testing API article`, () => {
       test(`Status code 201`, () => expect(response.statusCode).toBe(HttpCode.CREATED));
 
       test(`Comments count is changed`, () => request(app)
-        .get(`/articles/1TtuWX/comments`)
-        .expect((res) => expect(res.body.length).toBe(5)),
+        .get(`/articles/wzhsa2/comments`)
+        .expect((res) => expect(res.body.length).toBe(3)),
       );
 
     });
 
     describe(`API refuses to create a comment to non-existent article and returns status code 404`, () => {
-      const app = createAPI();
-      test(`Status code 404`, () => request(app)
+      test(`Status code 404`, () => request(createAPI())
         .post(`/articles/20/comments`)
         .send({
           text: `Неважно`,
@@ -365,12 +373,11 @@ describe(`Testing API article`, () => {
     });
 
     describe(`API refuses to create a comment when data is invalid, and returns status code 400`, () => {
-      const app = createAPI();
       const invalidComment = {
         text: `Не указан userId`,
       };
 
-      test(`Status code 400`, () => request(app)
+      test(`Status code 400`, () => request(createAPI())
         .post(`/articles/1TtuWX/comments`)
         .send(invalidComment)
         .expect(HttpCode.BAD_REQUEST));
@@ -387,14 +394,14 @@ describe(`Testing API article`, () => {
       beforeAll(async () => {
         app = await createAPI([articleService, commentService]);
         response = await request(app)
-          .delete(`/articles/1TtuWX/comments/HTlMS0`);
+          .delete(`/articles/EIZ8hL/comments/AFoxCA`);
       });
 
       test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
 
       // expect(articleServices.findAll()).toHaveLength(6));
 
-      test(`Comments count is 3 now`, () => expect(commentService.findAll(`1TtuWX`)).toHaveLength(3));
+      test(`Comments count is 0 now`, () => expect(commentService.findAll(`1TtuWX`)).toHaveLength(0));
 
       // test(`Comments count is 3 now`, () => request(app)
       //   .get(`/articles/1TtuWX/comments`)
@@ -405,9 +412,8 @@ describe(`Testing API article`, () => {
 
     test(`API refuses to delete non-existent comment`, async () => {
 
-      const app = await createAPI();
 
-      return request(app)
+      return request(createAPI())
         .delete(`/articles/1TtuWX/comments/100`)
         .expect(HttpCode.NOT_FOUND);
 
@@ -415,9 +421,8 @@ describe(`Testing API article`, () => {
 
     test(`API refuses to delete a comment to non-existent article`, async () => {
 
-      const app = await createAPI();
 
-      return request(app)
+      return request(createAPI())
         .delete(`/articles/20/comments/1`)
         .expect(HttpCode.NOT_FOUND);
 
