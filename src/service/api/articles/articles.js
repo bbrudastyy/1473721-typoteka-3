@@ -47,9 +47,9 @@ module.exports = (app, articleService, commentService) => {
   });
 
   // PUT /api/articles/:articleId — редактирует определённую публикацию;
-  route.put(`/:articleId`, articleValidator, async (req, res) => {
+  route.put(`/:articleId`, articleValidator, (req, res) => {
     const {articleId} = req.params;
-    const update = await articleService.update(articleId, req.body);
+    const update = articleService.update(articleId, req.body);
 
     if (!update) {
       return res.status(HttpCode.NOT_FOUND)

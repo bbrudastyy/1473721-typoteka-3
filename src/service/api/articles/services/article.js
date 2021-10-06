@@ -12,8 +12,6 @@ class ArticleService {
     const newArticle = Object
       .assign({id: nanoid(MAX_ID_LENGTH), comments: []}, article);
 
-    // console.log(newArticle);
-
     this._articles.push(newArticle);
     return newArticle;
   }

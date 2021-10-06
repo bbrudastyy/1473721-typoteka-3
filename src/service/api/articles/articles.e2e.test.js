@@ -66,8 +66,8 @@ const mockData = [
   },
 ];
 
-const cloneData = JSON.parse(JSON.stringify(mockData));
-const createAPI = (services = [new DataService(cloneData), new CommentService(cloneData)]) => {
+const cloneData = () => JSON.parse(JSON.stringify(mockData));
+const createAPI = (services = [new DataService(cloneData()), new CommentService(cloneData())]) => {
   const app = express();
   app.use(express.json());
   articles(app, ...services);
@@ -126,7 +126,7 @@ describe(`Testing API article`, () => {
 
       let app;
       let response;
-      let articleServices = new DataService(cloneData);
+      let articleServices = new DataService(cloneData());
 
       beforeAll(async () => {
         app = await createAPI([articleServices]);
@@ -206,10 +206,8 @@ describe(`Testing API article`, () => {
         let response;
         let articleServices;
         let commentService;
-        articleServices = new DataService(cloneData);
-        commentService = new CommentService(cloneData);
-
-        // test(`Articles count is changed`, () => expect(articleServices.findAll()).toHaveLength(4));
+        articleServices = new DataService(cloneData());
+        commentService = new CommentService(cloneData());
 
         beforeAll(async () => {
           app = await createAPI([articleServices, commentService]);
@@ -319,8 +317,6 @@ describe(`Testing API article`, () => {
 
       let response;
       let app;
-      // let articleService = new DataService(cloneData);
-      // let commentService = new DataService(cloneData);
 
       beforeAll(async () => {
         app = await createAPI();
@@ -388,8 +384,8 @@ describe(`Testing API article`, () => {
 
       let app;
       let response;
-      let articleService = new DataService(cloneData);
-      let commentService = new CommentService(cloneData);
+      let articleService = new DataService(cloneData());
+      let commentService = new CommentService(cloneData());
 
       beforeAll(async () => {
         app = await createAPI([articleService, commentService]);
@@ -399,15 +395,7 @@ describe(`Testing API article`, () => {
 
       test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
 
-      // expect(articleServices.findAll()).toHaveLength(6));
-
-      test(`Comments count is 0 now`, () => expect(commentService.findAll(`1TtuWX`)).toHaveLength(0));
-
-      // test(`Comments count is 3 now`, () => request(app)
-      //   .get(`/articles/1TtuWX/comments`)
-      //   .expect((res) => expect(res.body.length).toBe(3)),
-      // );
-
+      test(`Comments count is 0 now`, () => expect(commentService.findAll(`EIZ8hL`)).toHaveLength(0));
     });
 
     test(`API refuses to delete non-existent comment`, async () => {
