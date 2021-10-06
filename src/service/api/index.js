@@ -1,14 +1,14 @@
 'use strict';
 
 const {Router} = require(`express`);
-const categories = require(`./categories`);
-const search = require(`./search`);
-const articles = require(`./articles`);
+const categories = require(`./categories/categories`);
+const search = require(`./search/search`);
+const articles = require(`./articles/articles`);
 
-const CategoriesService = require(`../data-service/categories`);
-const SearchService = require(`../data-service/search`);
-const ArticleService = require(`../data-service/article`);
-const CommentService = require(`../data-service/comments`);
+const CategoriesService = require(`./categories/services/categories`);
+const SearchService = require(`./search/services/search`);
+const ArticleService = require(`./articles/services/article`);
+const CommentService = require(`./comments/services/comments`);
 const getMockData = require(`../lib/get-mock-data`);
 
 const app = new Router();

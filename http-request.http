@@ -59,7 +59,7 @@ Content-Type: application/json
 
 # Список комментариев
 
-GET http://localhost:3000/api/articles/1mGMzT/comments HTTP/1.1
+GET http://localhost:3000/api/articles/1TtuWX/comments HTTP/1.1
 
 ###
 

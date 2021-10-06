@@ -1,6 +1,6 @@
 'use strict';
 const {Router} = require(`express`);
-const HttpCode = require(`../../httpCode`);
+const HttpCode = require(`../../../httpCode`);
 
 const route = new Router();
 

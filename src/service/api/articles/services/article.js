@@ -1,7 +1,7 @@
 'use strict';
 
 const {nanoid} = require(`nanoid`);
-const {MAX_ID_LENGTH} = require(`../../constants`);
+const {MAX_ID_LENGTH} = require(`../../../../constants`);
 
 class ArticleService {
   constructor(articles) {
@@ -24,6 +24,7 @@ class ArticleService {
     }
 
     this._articles = this._articles.filter((item) => item.id !== id);
+
     return article;
   }
 
@@ -39,7 +40,13 @@ class ArticleService {
     const oldArticle = this._articles
       .find((item) => item.id === id);
 
-    return Object.assign(oldArticle, article);
+    if (oldArticle) {
+      return Object.assign(oldArticle, article);
+    }
+
+    return null;
+
+
   }
 }
 

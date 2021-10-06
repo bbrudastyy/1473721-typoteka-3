@@ -1,14 +1,15 @@
 'use strict';
 
 const {Router} = require(`express`);
-const HttpCode = require(`../../httpCode`);
-const articleValidator = require(`../middlewares/article-validator`);
-const articleExist = require(`../middlewares/article-exists`);
-const commentValidator = require(`../middlewares/comment-validator`);
-
-const route = new Router();
+const HttpCode = require(`../../../httpCode`);
+const articleValidator = require(`../../middlewares/article-validator`);
+const articleExist = require(`../../middlewares/article-exists`);
+const commentValidator = require(`../../middlewares/comment-validator`);
 
 module.exports = (app, articleService, commentService) => {
+  const route = new Router();
+
+
   app.use(`/articles`, route);
 
   // GET /api/articles — ресурс возвращает список публикаций;
@@ -46,13 +47,13 @@ module.exports = (app, articleService, commentService) => {
   });
 
   // PUT /api/articles/:articleId — редактирует определённую публикацию;
-  route.put(`/:articleId`, articleValidator, async (req, res) => {
+  route.put(`/:articleId`, articleValidator, (req, res) => {
     const {articleId} = req.params;
-    const update = await articleService.update(articleId, req.body);
+    const update = articleService.update(articleId, req.body);
 
     if (!update) {
       return res.status(HttpCode.NOT_FOUND)
-       .send(`Not found with ${articleId}`);
+        .send(`Not found with ${articleId}`);
     }
     return res.status(HttpCode.OK)
       .send(`Updated`);
@@ -91,11 +92,18 @@ module.exports = (app, articleService, commentService) => {
   // DELETE /api/articles/:articleId/comments/:commentId — удаляет из определённой публикации комментарий с идентификатором;
   route.delete(`/:articleId/comments/:commentId`, articleExist(articleService), async (req, res) => {
     const {articleId, commentId} = req.params;
+    const comment = await commentService.findOne(articleId, commentId);
+
+    if (!comment) {
+      return res.status(HttpCode.NOT_FOUND)
+        .send(`Comment not found`);
+    }
+
     const deletedComment = await commentService.drop(articleId, commentId);
 
     if (!deletedComment) {
-      return res.status(HttpCode.NOT_FOUND)
-        .send(`Not found`);
+      return res.status(HttpCode.FORBIDDEN)
+        .send(`Forbidden`);
     }
 
     return res.status(HttpCode.OK)

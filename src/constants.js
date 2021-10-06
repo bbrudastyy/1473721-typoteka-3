@@ -9,6 +9,8 @@ const ExitCode = {
   success: 0,
   error: 1
 };
+const DEVELOPMENT = `development`;
+const PRODUCTION = `production`;
 
 module.exports = {
   DEFAULT_COMMAND,
@@ -16,5 +18,10 @@ module.exports = {
   ExitCode,
   MAX_ID_LENGTH,
   MAX_COMMENTS,
-  API_PREFIX
+  API_PREFIX,
+};
+
+module.exports.Env = {
+  DEVELOPMENT,
+  PRODUCTION
 };
